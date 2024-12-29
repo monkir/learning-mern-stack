@@ -1,32 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import ItemTable from './ItemTable';
-
+import axios from 'axios'
 const ItemList = () => {
     const [items, setItems] = useState([]);
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState(0);
-
     const handleSubmit = async (e) => {
         console.log(e);
         e.preventDefault();
-        await fetch('http://localhost:5000/api/items', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, quantity }),
-        });
-        setName('');
-        setQuantity(0);
-        fetchItems();
+
+        try {
+            await axios.post('http://localhost:5000/api/items', { name, quantity });
+            setName('');
+            setQuantity(0);
+            fetchItems();
+        } catch { }
     };
 
     const fetchItems = async () => {
-        const response = await fetch('http://localhost:5000/api/items');
-        const data = await response.json();
-        setItems(data);
+        try {
+            const response = await axios.get('http://localhost:5000/api/items');
+            setItems(response.data);
+        } catch (ex) {
+            console.log(ex);
+        }
     };
 
     const deleteItem = async (id) => {
-        await fetch(`http://localhost:5000/api/items/${id}`, { method: 'DELETE' });
+        try {
+            await axios.delete(`http://localhost:5000/api/items/${id}`);
+        } catch { }
         fetchItems();
     };
 
@@ -54,7 +57,7 @@ const ItemList = () => {
 
             <div>
 
-                <ItemTable items={items} deleteItem={deleteItem}/>
+                <ItemTable items={items} deleteItem={deleteItem} />
 
             </div>
         </div >
